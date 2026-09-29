@@ -86,21 +86,6 @@ function sanitizeArgs(args: unknown[]): unknown[] {
   return args.map(sanitizeValue);
 }
 
-function formatArgs(args: unknown[]): string {
-  return args
-    .map((arg) => {
-      if (typeof arg === "object" && arg !== null) {
-        try {
-          return JSON.stringify(arg);
-        } catch {
-          return String(arg);
-        }
-      }
-      return String(arg);
-    })
-    .join(" ");
-}
-
 export const logger = {
   log: (...args: unknown[]): void => {
     console.log(...sanitizeArgs(args));

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { renderHook, act } from "@testing-library/react";
-import { useVirtualVaultList, VaultRow } from "./useVirtualVaultList";
+import { useVirtualVaultList } from "./useVirtualVaultList";
 import type { Vault } from "@/types/vault";
 
 const mockVaults: Vault[] = [

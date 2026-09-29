@@ -80,8 +80,22 @@ test('App Router foundation files exist', async (t) => {
     assert.ok(fileExists('app/layout.tsx'), 'app/layout.tsx not found');
   });
 
-  await t.test('app/page.tsx exists', () => {
-    assert.ok(fileExists('app/page.tsx'), 'app/page.tsx not found');
+  await t.test('app/ does not shadow Pages Router routes', () => {
+    // Next.js 16 (pinned) refuses to build when both routers declare the same
+    // path ("Conflicting app and page files were found"). The Pages Router is
+    // still the active router, so the App Router must not define these routes.
+    assert.ok(
+      !fileExists('app/page.tsx'),
+      'app/page.tsx must not exist — it conflicts with pages/index.tsx and fails `next build`',
+    );
+    assert.ok(
+      !fileExists('app/vault/[id]/page.tsx'),
+      'app/vault/[id]/page.tsx must not exist — it conflicts with pages/vault/[id].tsx and fails `next build`',
+    );
+    assert.ok(
+      !fileExists('app/vaults/[id]/page.tsx'),
+      'app/vaults/[id]/page.tsx must not exist — it re-exported the removed App Router vault route',
+    );
   });
 
   await t.test('app/layout.tsx exports default RootLayout', () => {
@@ -108,13 +122,7 @@ test('App Router foundation files exist', async (t) => {
     );
   });
 
-  await t.test('app/page.tsx exists with placeholder', () => {
-    const content = readFile('app/page.tsx');
-    assert.ok(
-      content.includes('export default function'),
-      'app/page.tsx must have default export'
-    );
-  });
+
 });
 
 // ── SUITE 3: next.config.js Configuration ────────────────────────────────────

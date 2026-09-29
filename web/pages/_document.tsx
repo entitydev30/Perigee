@@ -19,6 +19,7 @@ export default function Document() {
     <Html lang="en">
       <Head />
       <body>
+        {/* eslint-disable-next-line react/no-danger -- render-blocking theme bootstrap; runs before hydration to avoid a flash of the wrong theme. */}
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <Main />
         <NextScript />

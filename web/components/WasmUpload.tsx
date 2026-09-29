@@ -273,7 +273,6 @@ export default function WasmUpload({
     }
   };
 
-  const pendingCount = files.filter((f) => f.status === "pending").length;
   const uploadingCount = files.filter((f) => f.status === "uploading").length;
   const successCount = files.filter((f) => f.status === "success").length;
 

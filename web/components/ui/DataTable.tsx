@@ -106,7 +106,6 @@ function sortRows<T>(
   sortKey: string,
   direction: SortDirection,
 ): T[] {
-  const col = columns.find((c) => c.key === sortKey);
   return [...rows].sort((a, b) => {
     const aVal = (a as Record<string, unknown>)[sortKey];
     const bVal = (b as Record<string, unknown>)[sortKey];

@@ -56,10 +56,13 @@ export function normalizeVaultData(
 
   const id = String(raw.id || fallbackId || "unknown");
   const name = String(raw.name || parsedConfig.name || `Vault ${id}`);
-  const balance = Number(raw.balance ?? parsedConfig.balance ?? 0);
-  const asset = String(raw.asset || parsedConfig.asset || "XLM");
-  const apy = Number(raw.apy ?? parsedConfig.apy ?? 0);
-  const owner = String(raw.owner || ("manager_id" in raw ? raw.manager_id : "") || parsedConfig.owner || "Perigee");
+  // `VaultRecord` does not declare balance/asset/apy/owner, so view the
+  // payload through the shapes that do before reading those fields.
+  const source = raw as Partial<Vault> & VaultMetadataInput;
+  const balance = Number(source.balance ?? parsedConfig.balance ?? 0);
+  const asset = String(source.asset || parsedConfig.asset || "XLM");
+  const apy = Number(source.apy ?? parsedConfig.apy ?? 0);
+  const owner = String(source.owner || ("manager_id" in raw ? raw.manager_id : "") || parsedConfig.owner || "Perigee");
   const status = String(raw.status || "ACTIVE");
 
   return { id, name, balance, asset, apy, owner, status };

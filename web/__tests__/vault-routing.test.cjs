@@ -73,23 +73,12 @@ test('Pages Router vault page receives server-hydrated vault props', () => {
   );
 });
 
-test('App Router vault page already uses path params', () => {
-  const pagePath = path.join('app', 'vault', '[id]', 'page.tsx');
+test('App Router does not duplicate the vault route', () => {
+  // Next.js 16 (pinned) fails the build when App Router and Pages Router both
+  // match the same path, so the Pages Router page above is the only vault route.
+  const appPagePath = path.join('app', 'vault', '[id]', 'page.tsx');
   assert.ok(
-    fs.existsSync(path.join(WEB_ROOT, pagePath)),
-    'app/vault/[id]/page.tsx must exist',
-  );
-
-  const source = readWebFile(pagePath);
-
-  assert.match(
-    source,
-    /params:\s*Promise<\{ id: string \}>/,
-    'app/vault/[id]/page.tsx must type params as a path param',
-  );
-  assert.match(
-    source,
-    /resolvedParams\.id/,
-    'app/vault/[id]/page.tsx must read the ID from params',
+    !fs.existsSync(path.join(WEB_ROOT, appPagePath)),
+    'app/vault/[id]/page.tsx must not exist — it conflicts with pages/vault/[id].tsx and fails `next build`',
   );
 });

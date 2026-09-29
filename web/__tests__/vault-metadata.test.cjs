@@ -240,26 +240,28 @@ test('buildVaultJsonLd: creates valid Schema.org FinancialProduct structured dat
   assert.equal(jsonLd.annualPercentageYield, "18%");
 });
 
-test('App Router vault page exports generateMetadata and default component', () => {
-  const pagePath = path.join(__dirname, '..', 'app', 'vault', '[id]', 'page.tsx');
-  assert.ok(fs.existsSync(pagePath), "app/vault/[id]/page.tsx must exist");
+test('Pages Router vault page builds JSON-LD and OG metadata', () => {
+  // The App Router vault page was removed: Next.js 16 rejects overlapping
+  // App/Pages routes. The active Pages Router page must carry the metadata.
+  const pagePath = path.join(__dirname, '..', 'pages', 'vault', '[id].tsx');
+  assert.ok(fs.existsSync(pagePath), "pages/vault/[id].tsx must exist");
 
   const pageContent = fs.readFileSync(pagePath, 'utf8');
   assert.ok(
-    pageContent.includes("export async function generateMetadata"),
-    "app/vault/[id]/page.tsx must export generateMetadata"
-  );
-  assert.ok(
-    pageContent.includes("buildVaultMetadata"),
-    "app/vault/[id]/page.tsx must use buildVaultMetadata"
-  );
-  assert.ok(
     pageContent.includes("buildVaultJsonLd"),
-    "app/vault/[id]/page.tsx must use buildVaultJsonLd"
+    "pages/vault/[id].tsx must use buildVaultJsonLd"
   );
   assert.ok(
-    pageContent.includes("application/ld+json"),
-    "app/vault/[id]/page.tsx must render JSON-LD script"
+    pageContent.includes("buildVaultOgTags"),
+    "pages/vault/[id].tsx must use buildVaultOgTags"
+  );
+  assert.ok(
+    pageContent.includes("jsonLd={jsonLd}"),
+    "pages/vault/[id].tsx must pass JSON-LD to the SEO component"
+  );
+  assert.ok(
+    pageContent.includes("getServerSideProps"),
+    "pages/vault/[id].tsx must keep server-side vault data loading"
   );
 });
 

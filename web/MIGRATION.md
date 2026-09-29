@@ -31,10 +31,17 @@ Next.js 16 ships with App Router as the default. Continuing with Pages Router wi
 
 - [x] Pin Next.js version (`16.1.6`) to prevent accidental upgrades
 - [x] Create `app/` directory with root layout
-- [x] Create `app/page.tsx` placeholder
+- [x] Create `app/page.tsx` placeholder (removed in WEB-52 — see note below)
 - [x] Document migration plan in `MIGRATION.md`
 - [x] Update `next.config.js` with migration status comments
 - [x] Update `next.config.js` with experimental configuration section
+
+> **⚠️ Next.js 16 route overlap:** the pinned Next.js version fails the build
+> when App Router and Pages Router declare the same path ("Conflicting app and
+> page files were found"). Placeholder `app/page.tsx` and
+> `app/vault/[id]/page.tsx` were therefore removed while the Pages Router
+> remains active. When migrating a route, **move** the file (add the `app/`
+> copy and delete the `pages/` copy in the same commit) instead of copying it.
 
 ## Phase 2 — Simple Pages (No Data Fetching)
 

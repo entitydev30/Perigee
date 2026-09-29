@@ -8,7 +8,8 @@ import { Analytics } from "../components/Analytics";
 import { NetworkStatusBanner } from "../components/NetworkStatusBanner";
 import { RpcFallbackBanner } from "../components/RpcFallbackBanner";
 import { NextIntlClientProvider } from "next-intl";
-import defaultMessages from "../messages/en.json";
+import rawMessages from "../messages/en.json";
+import { nestMessages } from "../lib/messages";
 import { API_URL } from "../lib/api";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
@@ -18,6 +19,8 @@ import { FeatureFlagProvider } from "../features/feature-flags";
 // `prefers-reduced-motion` setting, in addition to the per-component
 // `useReducedMotion()` guards already in place.
 import { MotionProvider } from "../components/MotionProvider";
+// WEB-52 (#185): global ⌘K command palette, mounted once for every route.
+import { CommandPalette } from "../components/CommandPalette";
 
 // WEB-54 (#187): self-host the Inter typeface through `next/font`. Font files
 // are downloaded and preloaded at build time, eliminating FOIT and render
@@ -27,6 +30,11 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
 });
+
+// The en.json file uses flat dotted keys, but use-intl v4 resolves keys as
+// nested paths — nest once here so prerendered pages ship real copy instead
+// of raw keys (MISSING_MESSAGE noise during `next build`).
+const defaultMessages = nestMessages(rawMessages);
 
 /**
  * Initialize @axe-core/react in development so accessibility violations
@@ -57,11 +65,12 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <div className={inter.className}>
+      <CommandPalette />
       <MotionProvider>
         <FeatureFlagProvider>
           <NextIntlClientProvider
             locale={router?.locale ?? "en"}
-            messages={pageProps.messages ?? {}}
+            messages={pageProps.messages ?? defaultMessages}
             timeZone="UTC"
           >
             <WalletProvider>
@@ -82,29 +91,6 @@ export default function App({ Component, pageProps }: AppProps) {
           </NextIntlClientProvider>
         </FeatureFlagProvider>
       </MotionProvider>
-      <FeatureFlagProvider>
-        <NextIntlClientProvider
-          locale={router?.locale ?? "en"}
-          messages={pageProps.messages ?? defaultMessages}
-          timeZone="UTC"
-        >
-          <WalletProvider>
-            {/* Network status and API availability (#109) */}
-            <NetworkStatusBanner apiUrl={API_URL} />
-            {/*
-             * Graceful RPC fallback — shown when the backend is unreachable (#115).
-             * Wraps ErrorBoundary so children can read `useRpcFallback()` to display
-             * stale-data badges on individual views.
-             */}
-            <RpcFallbackBanner apiUrl={API_URL}>
-              <ErrorBoundary>
-                <Component {...pageProps} />
-                <Analytics />
-              </ErrorBoundary>
-            </RpcFallbackBanner>
-          </WalletProvider>
-        </NextIntlClientProvider>
-      </FeatureFlagProvider>
     </div>
   );
 }

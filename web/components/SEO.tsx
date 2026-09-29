@@ -121,10 +121,8 @@ export function SEO({
 
       {/* Structured Data (JSON-LD) */}
       {jsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        // eslint-disable-next-line react/no-danger -- JSON-LD must be an inline <script>; content is JSON.stringify()'d structured data.
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       )}
     </Head>
   );

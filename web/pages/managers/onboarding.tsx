@@ -59,6 +59,7 @@ export default function ManagerOnboarding() {
     if (address) {
       checkExisting(address);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- checkExisting is re-declared every render; re-running on [address] only avoids a status-fetch loop.
   }, [address]);
 
   async function checkExisting(addr: string) {

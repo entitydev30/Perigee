@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from 'react';
 import { useDropzone, FileRejection } from 'react-dropzone';
-import { parseWasmError, WasmBackendError } from '../lib/errorHandling';
+import { parseWasmError } from '../lib/errorHandling';
 import { arrayBufferToBase64 } from '../lib/utils';
 import { API_URL } from '../lib/api';
 import { useTranslations } from 'next-intl';
@@ -207,7 +207,7 @@ export function UploadZone({
   const [uploadState, setUploadState] = useState<UploadState>("idle");
   const [droppedFile, setDroppedFile] = useState<DroppedFile | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [errorDetails, setErrorDetails] = useState<ErrorDetails | null>(null);
+  const [, setErrorDetails] = useState<ErrorDetails | null>(null);
   const [unexpectedError, setUnexpectedError] = useState<Error | null>(null);
 
   if (unexpectedError) {
@@ -242,21 +242,16 @@ export function UploadZone({
               });
 
               if (!response.ok) {
-                const errorText = await response.text();
-                let errorMessage = errorText;
-
                 // Try to parse as JSON for better error details
                 const contentType = response.headers.get("content-type");
                 if (contentType && contentType.includes("application/json")) {
                   const errData = await response.json();
 
-                  let detailsMsg = "";
                   if (errData.error && typeof errData.error === "object") {
                     const parseResult = parseWasmError(
                       response,
                       errData.message || "",
                     );
-                    detailsMsg = parseResult.details || parseResult.message;
 
                     setErrorDetails({
                       title: "WASM Validation Failed",
@@ -294,7 +289,7 @@ export function UploadZone({
                 return;
               }
 
-              const data = await response.json();
+              await response.json();
               setUploadState("success");
               onFileReady?.(file);
               resolve(true);
@@ -483,7 +478,7 @@ export function UploadZone({
     });
     setUploadState("error");
     setDroppedFile(null);
-  }, []);
+  }, [t]);
 
   const wasmValidator = useCallback((file: File) => {
     const extension = file.name.split(".").pop()?.toLowerCase();
@@ -494,7 +489,7 @@ export function UploadZone({
       };
     }
     return null;
-  }, []);
+  }, [t]);
   const onDragEnter = useCallback(() => {
     if (uploadState !== "scanning") setUploadState("hover");
   }, [uploadState]);

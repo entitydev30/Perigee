@@ -3,7 +3,7 @@ import Image from "next/image";
 
 import { useWalletStore } from "../context/WalletContext";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Wallet, Check, AlertCircle } from "lucide-react";
+import { Check, AlertCircle } from "lucide-react";
 import React from "react";
 import UserIcon from "./userIcon";
 import { logger } from "../lib/logger";

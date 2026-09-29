@@ -19,6 +19,7 @@ export default function AdminManagers() {
 
   useEffect(() => {
     loadManagers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadManagers is re-declared every render; re-running on [filter] only avoids an infinite fetch loop.
   }, [filter]);
 
   async function loadManagers() {

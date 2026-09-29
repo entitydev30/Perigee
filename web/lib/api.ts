@@ -22,13 +22,18 @@ const DEFAULT_DEV_API_URL = "http://localhost:8080";
 export class ValidationError extends DtoValidationError {}
 
 export async function validateAnalyzeRequest(req: AnalyzeRequest): Promise<AnalyzeRequest> {
-  return validateDto(AnalyzeRequestDto, req);
+  const dto = await validateDto(AnalyzeRequestDto, req);
+  // `validateDto` re-runs every field through `ensureString` & friends, so the
+  // required fields are guaranteed present even though the DTO types them as
+  // optional for unvalidated payloads.
+  return dto as AnalyzeRequest;
 }
 
 export async function validateAnalyzeWasmRequest(
   req: AnalyzeWasmRequest,
 ): Promise<AnalyzeWasmRequest> {
-  return validateDto(AnalyzeWasmRequestDto, req);
+  const dto = await validateDto(AnalyzeWasmRequestDto, req);
+  return dto as AnalyzeWasmRequest;
 }
 
 const isProduction = process.env.NODE_ENV === "production";

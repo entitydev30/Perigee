@@ -2,6 +2,7 @@ import type { GetServerSideProps } from "next";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { SEO } from "../../components/SEO";
+import { CommandPaletteTrigger } from "../../components/CommandPalette";
 import { Vault } from "../../types/vault";
 import {
   buildVaultJsonLd,
@@ -75,12 +76,15 @@ export default function PagesVaultDetailPage({
                 {t("vault.details")}
               </span>
             </div>
-            <Link
-              href="/"
-              className="text-sm font-medium text-slate-400 hover:text-cyan-400 transition-colors"
-            >
-              {t("nav.backToDashboard")}
-            </Link>
+            <div className="flex items-center gap-3">
+              <CommandPaletteTrigger />
+              <Link
+                href="/"
+                className="text-sm font-medium text-slate-400 hover:text-cyan-400 transition-colors"
+              >
+                {t("nav.backToDashboard")}
+              </Link>
+            </div>
           </div>
         </header>
 

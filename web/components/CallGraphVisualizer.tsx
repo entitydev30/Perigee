@@ -53,7 +53,7 @@ export function CallGraphVisualizer({ mermaidDefinition }: CallGraphVisualizerPr
     return () => {
       isMounted = false;
     };
-  }, [mermaidDefinition]);
+  }, [mermaidDefinition, t]);
 
   return (
     <div style={{ marginTop: '20px' }}>

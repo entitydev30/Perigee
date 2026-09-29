@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { useTranslations } from "next-intl";
 
 import { ConnectButton } from "../components/ConnectButton";
+import { CommandPaletteTrigger } from "../components/CommandPalette";
 import { ContractInteraction } from "../components/ContractInteraction";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 import { FunctionSidebar } from "../components/FunctionSidebar";
@@ -13,6 +14,7 @@ import { analyzeService } from "../lib/api";
 import { trackTelemetryEvent } from "../lib/telemetry";
 import { contractIds } from "../lib/contracts.config";
 import { sanitizeUserInput } from "../lib/sanitize";
+import { arrayBufferToBase64 } from "../lib/utils";
 import {
   MOCK_CONTRACT_FUNCTIONS,
   generateMockResult,
@@ -23,9 +25,9 @@ import {
 
 export default function Home() {
   const t = useTranslations();
-  const [contractId, setContractId] = useState(
-    contractIds.helloSoroban ?? "",
-  );
+  // The contract ID is fixed to the configured default: ContractInteraction
+  // renders the function form only, so there is no contract picker to update it.
+  const [contractId] = useState(contractIds.helloSoroban ?? "");
   const [selectedFunction, setSelectedFunction] = useState<ContractFunction>(
     MOCK_CONTRACT_FUNCTIONS[0],
   );
@@ -116,6 +118,17 @@ export default function Home() {
     setWasmData(data);
   }, []);
 
+  // UploadZone hands back a validated File; the simulator posts base64 bytes.
+  const handleFileReady = useCallback(
+    (file: File) => {
+      file
+        .arrayBuffer()
+        .then((buffer) => handleWasmUpload(arrayBufferToBase64(buffer)))
+        .catch(() => setWasmData(null));
+    },
+    [handleWasmUpload],
+  );
+
   // Compute the sidebar function list once — MOCK_CONTRACT_FUNCTIONS is a
   // module-level constant so this memo is effectively free after first render.
   const functionList = useMemo(() => MOCK_CONTRACT_FUNCTIONS, []);
@@ -134,26 +147,30 @@ export default function Home() {
       <div className="w-full max-w-7xl px-4 py-8">
         <header className="mb-8 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-sky-400">{t("home.title")}</h1>
-          <ConnectButton />
+          <div className="flex items-center gap-3">
+            <CommandPaletteTrigger />
+            <ConnectButton />
+          </div>
         </header>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
           <aside>
             <FunctionSidebar
               functions={functionList}
-              selected={selectedFunction}
+              selectedFunction={selectedFunction}
               onSelect={handleSelectFunction}
             />
           </aside>
 
           <div className="flex flex-col gap-6">
-            <UploadZone onUpload={handleWasmUpload} />
+            <UploadZone
+              onFileReady={handleFileReady}
+              onReset={() => setWasmData(null)}
+            />
             <ContractInteraction
-              contractId={contractId}
-              onContractIdChange={setContractId}
               selectedFunction={selectedFunction}
-              onSimulate={handleSimulate}
-              isLoading={loading}
+              loading={loading}
+              onSubmit={handleSimulate}
             />
             {currentResult && (
               <ErrorBoundary>
